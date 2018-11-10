@@ -22,6 +22,14 @@ lazy_static! {
     };
 }
 
+fn check_arity(expected: usize, actual: usize) -> Result<()> {
+    if actual >= expected {
+        Ok(())
+    } else {
+        Err(Error::ArityMismatch)
+    }
+}
+
 fn apply_numeric_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
     if args.len() < 2 {
         return Err(Error::InvalidToken);
