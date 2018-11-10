@@ -22,6 +22,7 @@ lazy_static! {
         map.insert("cos", Callback { arity: 1, func: |args| apply_num_unop(args, f64::cos)});
         map.insert("tan", Callback { arity: 1, func: |args| apply_num_unop(args, f64::tan)});
         //map.insert("copy", |args| )
+        map.insert("if", Callback { arity: 3, func: handle_if});
         map
     };
 }
@@ -53,4 +54,19 @@ fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     let result = func(a);
 
     Ok(Token::Number(result))
+}
+
+fn handle_if(args: &[Token]) -> Result<Token> {
+    check_arity(3, args.len())?;
+
+    // Bools are written [then] [else] if
+    let condition = args[0].get_boolean()?;
+    let else_case = args[1].clone();
+    let then_case = args[2].clone();
+
+    if condition {
+        Ok(then_case)
+    } else {
+        Ok(else_case)
+    }
 }
