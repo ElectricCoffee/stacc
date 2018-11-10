@@ -1,18 +1,22 @@
 use std::collections::{HashMap, VecDeque};
 use std::ops::*;
-use std::result;
-use token::{Stack, Token};
+use token::{Token};
 use error::{Error, Result};
 
 type Bif = fn(&[Token]) -> Result<Token>; // short for Built-In Function
 
+pub struct Callback {
+    pub arity: usize,
+    pub func: Bif,
+}
+
 lazy_static! {
-    static ref BIFS: HashMap<&'static str, Bif> = {
-        let mut map: HashMap<&'static str, Bif> = HashMap::new();
-        map.insert("+", |args| apply_numeric_binop(args, f64::add));
-        map.insert("-", |args| apply_numeric_binop(args, f64::sub));
-        map.insert("*", |args| apply_numeric_binop(args, f64::mul));
-        map.insert("/", |args| apply_numeric_binop(args, f64::div));
+    pub static ref BIFS: HashMap<&'static str, Callback> = {
+        let mut map: HashMap<&'static str, Callback> = HashMap::new();
+        map.insert("+", Callback { arity: 2, func: |args| apply_numeric_binop(args, f64::add)});
+        map.insert("-", Callback { arity: 2, func: |args| apply_numeric_binop(args, f64::sub)});
+        map.insert("*", Callback { arity: 2, func: |args| apply_numeric_binop(args, f64::mul)});
+        map.insert("/", Callback { arity: 2, func: |args| apply_numeric_binop(args, f64::div)});
         //map.insert("copy", |args| )
         map
     };
