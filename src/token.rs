@@ -41,4 +41,11 @@ impl Token {
             _ => Err(Error::ArgumentMismatch),
         }
     }
+
+    pub fn get_boolean(&self) -> Result<bool> {
+        match self {
+            Token::Boolean(b) => Ok(*b),
+            _ => Err(Error::ArgumentMismatch),
+        }
+    }
 }
