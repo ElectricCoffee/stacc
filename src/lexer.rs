@@ -17,6 +17,10 @@ lazy_static! {
         map.insert("-", Callback { arity: 2, func: |args| apply_num_binop(args, f64::sub)});
         map.insert("*", Callback { arity: 2, func: |args| apply_num_binop(args, f64::mul)});
         map.insert("/", Callback { arity: 2, func: |args| apply_num_binop(args, f64::div)});
+        map.insert("neg", Callback { arity: 1, func: |args| apply_num_unop(args, f64::neg)});
+        map.insert("sin", Callback { arity: 1, func: |args| apply_num_unop(args, f64::sin)});
+        map.insert("cos", Callback { arity: 1, func: |args| apply_num_unop(args, f64::cos)});
+        map.insert("tan", Callback { arity: 1, func: |args| apply_num_unop(args, f64::tan)});
         //map.insert("copy", |args| )
         map
     };
@@ -42,3 +46,11 @@ fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
     Ok(Token::Number(result))
 }
 
+fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
+    check_arity(1, args.len())?;
+
+    let a = args[0].get_number()?;
+    let result = func(a);
+
+    Ok(Token::Number(result))
+}
