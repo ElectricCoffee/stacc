@@ -11,5 +11,8 @@ mod scope;
 mod tables;
 
 fn main() {
+    let mut scopes = tables::ScopeTable::new();
+    let mut main_scope = scope::Scope::new(&mut scopes, None);
+    
     println!("Hello, world!");
 }
