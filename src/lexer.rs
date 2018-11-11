@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use std::ops::*;
 use token::{Token};
 use error::{Error, Result};
