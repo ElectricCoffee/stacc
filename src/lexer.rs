@@ -27,7 +27,7 @@ lazy_static! {
     };
 }
 
-fn check_arity(expected: usize, actual: usize) -> Result<()> {
+pub fn check_arity(expected: usize, actual: usize) -> Result<()> {
     if actual >= expected {
         Ok(())
     } else {
@@ -35,19 +35,18 @@ fn check_arity(expected: usize, actual: usize) -> Result<()> {
     }
 }
 
-fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
+pub fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
     check_arity(2, args.len())?;
 
-    // NB: the args get pushed to the slice in reverse order
-    let a = args[1].get_number()?;
-    let b = args[0].get_number()?;
+    let a = args[0].get_number()?;
+    let b = args[1].get_number()?;
 
     let result = func(a, b);
 
     Ok(Token::Number(result))
 }
 
-fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
+pub fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     check_arity(1, args.len())?;
 
     let a = args[0].get_number()?;
@@ -56,13 +55,13 @@ fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     Ok(Token::Number(result))
 }
 
-fn handle_if(args: &[Token]) -> Result<Token> {
+pub fn handle_if(args: &[Token]) -> Result<Token> {
     check_arity(3, args.len())?;
 
-    // Bools are written [then] [else] if
-    let condition = args[0].get_boolean()?;
+    // Bools are written [then] [else] cond if
+    let then_case = args[0].clone();
     let else_case = args[1].clone();
-    let then_case = args[2].clone();
+    let condition = args[2].get_boolean()?;
 
     if condition {
         Ok(then_case)

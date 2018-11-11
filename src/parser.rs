@@ -2,6 +2,7 @@ use token::{Stack, Token};
 use lexer;
 use error::{self, Error};
 
+/// Parses an n-ary operator
 pub fn parse_nary(stack: &mut Stack, symbol: &str) -> error::Result<()> {
     // get the callback stored in BIFS, if available
     let callback = lexer::BIFS.get(symbol).ok_or(Error::UnknownIdentifier)?;
@@ -18,6 +19,8 @@ pub fn parse_nary(stack: &mut Stack, symbol: &str) -> error::Result<()> {
         let token = stack.pop_back().unwrap();
         args.push(token);
     };
+
+    args.reverse(); // ensure the args appear in the right order
 
     // call the inner function
     let fun = callback.func;
