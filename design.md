@@ -23,6 +23,9 @@ The syntax for defining a variable would be
 **NOTE:** Defining a variable removes its data from the stack entirely. 
 It will only exist in the lookup table from then on.
 
+**NOTE:** One could argue that perhaps variables should be defined as `$name value def` instead, to make it consistent with the RPN operand rules;
+and while that is indeed a valid ciritcism, I feel that being able to write `$name def` and use what's already on the stack is more useful.
+
 **PROBLEM:** How do I prevent lookup resolution from removing the variable name before `def` can define it?
 
 Possible solutions:
@@ -92,7 +95,7 @@ Imagine the following program:
 ```
 (
     $angle def             # pop angle off the stack and assign it to $angle
-    $distance def          # pop the distance off the stack and assign it to distance
+    $distance def          # pop the distance off the stack and assign it to $distance
     $angle cos $distance * # push cos(angle) * distance onto the stack
     $angle sin $distance * # push sin(angle) * distance onto the stack
 ) $calc_coords def
