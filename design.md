@@ -115,6 +115,35 @@ During symbol resolution, the angle inside `$calc_coords` would be called `b3bd1
 Possible solutions:
 * Have the lookup operation performed by `def` clear out any values if they already exist
 
+#### Keeping Track of Scope
+In order to keep scope resolution safe, sane, and healthy; we need to somehow be able to keep track of the current context, while also executing the new scope.
+
+Let us consider this simple code:
+```
+(+ 3 -) $foo def
+2 3 $foo 4 *
+```
+we first define `$foo` to be a scoped variable, then on the very next line we have to resolve the name and expand it.
+
+There are two general approaches to do this: 
+1. Either we splice the result of `$foo` directly into the code, like this: `2 3 + 3 - 4 *`, 
+2. The code switches context to the scope, executes it, then returns back to the main scope without splicing anything.
+
+**The first approach:** 
+It doesn't really adhere well to the stackiness of the program, as it somehow has to push the execution of the scope ahead of where it's gotten to.
+It also creates issues where the interpreter has to deal with both fully lexed code and plaintext, which makes designing the interpreter much harder.
+
+**The second approach:**
+Jumps to a different place in its execution, which doesn't violate the premise of the stack.
+It does require appending the results of whatever operations it did back onto the stack so they don't disappear into the æther.
+This approach doesn't cause any issues with the unlexed plaintext, but it does create the issue of having the code intelligently switch contexts.
+
+This in turn can also be done in two ways:
+1. Have the parser simply call into the new scope, and return once done
+2. Have the parser save the name of the current scope before starting the execution of the new one, restoring the previous scope afterwards.
+
+Both of the approaches can be simplified if the language switches to a two-pass interpreter.
+
 ### Conditionals
 As with any other programming language, conditionals are a must-have for the language.
 Though as one might expect, being stack-based leads to some interesting considerations:

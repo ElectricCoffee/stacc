@@ -53,7 +53,7 @@ pub fn parse_symbol(stack: &mut Stack, symbol: &str) -> Result<()> {
 
     // if the result is a scope, append it to the stack instead of pushing it
     if let Token::Scope(mut result_stack) = result {
-        stack.append(&mut result_stack);
+        stack.append(&mut result_stack); // TODO: FIX THIS
     }
     // if the result isn't a void, add the result to the stack
     else if result != Token::Void {
