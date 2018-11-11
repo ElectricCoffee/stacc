@@ -28,7 +28,7 @@ lazy_static! {
 }
 
 /// Parses an n-ary operator
-pub fn parse_nary(stack: &mut Stack, symbol: &str) -> Result<()> {
+pub fn parse_symbol(stack: &mut Stack, symbol: &str) -> Result<()> {
     // get the callback stored in BIFS, if available
     let callback = BIFS.get(symbol).ok_or(Error::UnknownIdentifier)?;
 
@@ -51,8 +51,12 @@ pub fn parse_nary(stack: &mut Stack, symbol: &str) -> Result<()> {
     let fun = callback.func;
     let result = fun(&args)?;
 
+    // if the result is a scope, append it to the stack instead of pushing it
+    if let Token::Scope(mut result_stack) = result {
+        stack.append(&mut result_stack);
+    }
     // if the result isn't a void, add the result to the stack
-    if result != Token::Void {
+    else if result != Token::Void {
         stack.push_back(result);
     }
 
