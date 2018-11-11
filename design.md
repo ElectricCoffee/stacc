@@ -59,7 +59,8 @@ So let us imagine we have the following scopes:
 Main Scope: 
     parent: None # we're in the root scope, so no parent exists
     id: 5eff1f4b # needs to know its own id
-    stack: [44.5, 2, /, $a, +] #NB: this is just the current stack, not the full one
+    stack: [44.5, 2, /, $a, +] # NB: this is just the current stack, not the full one
+
 Inner Scope:
     parent: Some(5eff1f4b) # refers back to the root scope
     id: 6ddf29b8
@@ -71,6 +72,10 @@ Note that both stacks here contain the same variable `$a`, but it is unclear wha
 ```yaml
 5eff1f4b: # main scope
     $a: 13
+    $inner_scope: # the same inner scope as above, here defined as a variable
+        parent: Some(5eff1f4b)
+        id: 6ddf29b8
+        stack: [2, pi, *, $a, $b, -, +]
 6ddf29b8:
     $b: 45
 ```
