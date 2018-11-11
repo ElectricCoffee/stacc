@@ -114,3 +114,45 @@ During symbol resolution, the angle inside `$calc_coords` would be called `b3bd1
 
 Possible solutions:
 * Have the lookup operation performed by `def` clear out any values if they already exist
+
+### Conditionals
+As with any other programming language, conditionals are a must-have for the language.
+Though as one might expect, being stack-based leads to some interesting considerations:
+
+1. Is it possible to have variable-length conditionals a-la `switch/match` or `cond`?
+    1. If so, what are the options?
+    2. If not, what other options do we have?
+2. `if` is the obvious first case, but should it have the `then` branch first or the `else` branch first?
+3. Should I go in Lisp's footsteps and also include `when` and `unless` for single-branch if-statements?
+
+Let's for a second go with first having the `then` branch, then the `else` branch afterwards.
+For some reason it feels more natural that way. 
+Later iterations could change this.
+
+Not much to say except to look at an example:
+```
+44
+(3 +) (2 -) $a 19 < if
+```
+Here we push 44 onto the stack, and then we either add 3 or subtract 2 depending on whether or not `$a` is less than 19.
+
+Now, it may look like the `if` is taking 5 arguments here, but remember that we're dealing with a stack, so before the `if` keyword is even reached, the expression `$a 19 <` has already been evaluated.
+
+My idea for putting the condition near the `if` keyword here, is the same as for `def`, because it lets us utilise the stack right away.
+
+If we only want a single branch in our code though, writing an if-statement wouldn't work, since it explicitly pops 3 values off the stack.
+
+For that we can have `when` and `unless`, which act like each others' inverses:
+
+```
+44
+(3 +) $a 19 < when
+```
+adds 3 to 44 if the condition is true
+```
+44
+(2 -) $a 19 < unless
+```
+subtracts 2 from 44 if the condition is false.
+
+**PROBLEM:** Is it doable to make a switch statement?
