@@ -101,3 +101,5 @@ First we define an angle and a distance within the local scope (delimited by `()
 
 Without scoping rules, the resolution of `$angle` would not be possible; but **with** scoping rules, the `$angle` outside of `$calc_coords` would not clash with the name inside. 
 During symbol resolution, the angle inside `$calc_coords` would be called `b3bd15d9$angle`, while the one in the outer scope would be called `5eff1f4b$angle`.
+
+**PROBLEM:** I need to figure out how to handle removing a scope. If a scope gets re-defined or deleted, its local variables need to get invalidated somehow.
