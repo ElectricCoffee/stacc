@@ -156,3 +156,6 @@ adds 3 to 44 if the condition is true
 subtracts 2 from 44 if the condition is false.
 
 **PROBLEM:** Is it doable to make a switch statement?
+
+Possible solutions:
+* put all the cases into their own scope, and use the length of said scope to determine number of cases
