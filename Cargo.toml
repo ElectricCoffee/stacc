@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Niko Lepka <slench102+git@gmail.com>"]
 
 [dependencies]
-rand = "0.5.5"
-regex = "1.0.6"
-lazy_static = "1.2.0"
+rand = "0.5.5"        # for supporting rng
+regex = "1.0.6"       # for parsing regular expressions (duh)
+lazy_static = "1.2.0" # for providing a const hashmap (and more)
+uuid = "0.7.1"        # for assigning unique IDs to scopes
