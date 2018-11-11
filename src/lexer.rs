@@ -27,8 +27,10 @@ lazy_static! {
     };
 }
 
+/// Checks if the expected arity matches the actual one.
+/// Returns Error::ArityMismatch if it doesn't, and nothing if all is fine.
 pub fn check_arity(expected: usize, actual: usize) -> Result<()> {
-    if actual >= expected {
+    if actual == expected {
         Ok(())
     } else {
         Err(Error::ArityMismatch)
