@@ -20,6 +20,9 @@ The syntax for defining a variable would be
 * `$name def` if the value is already on the stack,
 * `def` if the value and variable-name are already on the stack.
 
+**NOTE:** Defining a variable removes its data from the stack entirely. 
+It will only exist in the lookup table from then on.
+
 **PROBLEM:** How do I prevent lookup resolution from removing the variable name before `def` can define it?
 
 Possible solutions:
@@ -35,6 +38,12 @@ Instead, re-callable stacks are introduced as first-class citizens.
 
 These re-callable stacks would have their own local scopes (see "Scoping" section for details), in which locally defined variabels would rule.
 Each scope would still be tied to the global stack though, so one has to be careful with how one manipulates it to not screw something up royally.
+
+The syntax of functions is essentially the same as variables, except the scopes are surrounded in parentheses:
+```
+(copy *) $square def
+```
+defines a function called `$square` that copies the topmost value of the stack, and then multiplies it by itself, squaring it.
 
 ### Scoping
 NOTE: before we start this discussion, let me make it clear that all the hexadecimal IDs in the examples are randomly generated, and not actually indicative of any _actual_ IDs. In fact, using Rust's UUID library, the IDs would be 128-bit, whereas the example ones are only 32-bit.
