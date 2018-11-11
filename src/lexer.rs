@@ -37,6 +37,7 @@ pub fn check_arity(expected: usize, actual: usize) -> Result<()> {
     }
 }
 
+/// Applies a binary numeric operation and returns the resulting token.
 pub fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
     check_arity(2, args.len())?;
 
@@ -48,6 +49,7 @@ pub fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Toke
     Ok(Token::Number(result))
 }
 
+/// Applies a unary numeric operation and returns the resulting token.
 pub fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     check_arity(1, args.len())?;
 
@@ -57,10 +59,11 @@ pub fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     Ok(Token::Number(result))
 }
 
+/// Applies an if-statement operation and returns the corresponding token
 pub fn handle_if(args: &[Token]) -> Result<Token> {
     check_arity(3, args.len())?;
 
-    // Bools are written [then] [else] cond if
+    // if-statements are written [then] [else] cond if
     let then_case = args[0].clone();
     let else_case = args[1].clone();
     let condition = args[2].get_boolean()?;
