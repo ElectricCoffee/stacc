@@ -1,21 +1,16 @@
-use std::collections::HashMap;
 use uuid::Uuid;
-use token::{Token, Stack};
-
-/// Stores the name of a symbol and the associated data stored within
-pub type SymbolTable = HashMap<String, Token>;
-
-/// Stores the symbol table of each scope
-pub type ScopeTable = HashMap<Uuid, SymbolTable>;
+use tables::{ScopeTable, SymbolTable};
+use token::Stack;
 
 pub struct Scope {
     parent: Option<Uuid>,
     id: Uuid,
-    stack: Stack,
+    pub stack: Stack,
 }
 
 impl Scope {
-    fn new(scopes: &mut ScopeTable, parent: Option<Uuid>) -> Scope {
+    /// Creates a new scope and assigns it to the scope table
+    pub fn new(scopes: &mut ScopeTable, parent: Option<Uuid>) -> Scope {
         let mut id = Uuid::new_v4();
 
         // if the newly created scope's ID is a name clash, try again
@@ -32,11 +27,18 @@ impl Scope {
         }
     }
 
-    fn has_parent(&self) -> bool {
+    /// Checks if the current scope has a parent
+    pub fn has_parent(&self) -> bool {
         self.parent.is_some()
     }
 
-    fn id(&self) -> Uuid {
+    /// Gets the parent ID of the current scope if available
+    pub fn parent_id(&self) -> Option<Uuid> {
+        self.parent
+    }
+
+    /// Gets the ID of the current scope
+    pub fn id(&self) -> Uuid {
         self.id
     }
 }

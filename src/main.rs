@@ -8,6 +8,7 @@ mod parser;
 mod token;
 mod error;
 mod scope;
+mod tables;
 
 fn main() {
     println!("Hello, world!");
