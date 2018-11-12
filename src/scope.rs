@@ -1,6 +1,6 @@
 use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
-use token::Stack;
+use token::{Token, Stack};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
@@ -19,7 +19,15 @@ impl Scope {
             id = Uuid::new_v4();
         }
 
-        scopes.insert(id, SymbolTable::new());
+        let mut table_entry = SymbolTable::new();
+
+        // if the scope has a parent, add special $$PARENT$$ entry 
+        // so the parent can be referenced from the symbol table
+        if let Some(parent_id) = parent {
+            table_entry.insert("$$PARENT$$".into(), Token::Id(parent_id));
+        }
+
+        scopes.insert(id, table_entry);
 
         Scope {
             parent,
