@@ -6,12 +6,13 @@ pub type Stack = VecDeque<Token>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    Number(f64),
-    Symbol(String),
-    String(String),
-    Scope(Scope),
-    Boolean(bool),
-    Void,
+    Number(f64),    // Keeps track of numeric values (May need to be replaced by a custom value) 1, 2.0, -3, etc.
+    Symbol(String), // Holds the names of symbols (subject to change) if, for, $a, $value, etc
+    String(String), // Holds strings, "you get the idea"
+    Scope(Scope),   // Used for nested scopes, (...)
+    List(Stack),    // Used for lists, [...]
+    Boolean(bool),  // Used for booleans, true and false
+    Void,           // Used for operations that don't produce any results
 }
 
 impl Token {
@@ -75,6 +76,22 @@ impl Token {
     pub fn is_scope(&self) -> bool {
         match self {
             Token::Scope(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Attempts to get a token as a scope.
+    /// If it fails, it returns an argument mismatch error.
+    pub fn get_list(&self) -> Result<Stack> {
+        match self {
+            Token::List(l) => Ok(l.clone()),
+            _ => Err(Error::ArgumentMismatch),
+        }
+    }
+
+    pub fn is_list(&self) -> bool {
+        match self {
+            Token::List(_) => true,
             _ => false,
         }
     }
