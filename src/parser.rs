@@ -25,6 +25,7 @@ lazy_static! {
         map.insert("tan", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan)});
         //map.insert("copy", |args| )
         map.insert("if", Callback { arity: 3, func: |_, _, args| handle_if(args)});
+        map.insert("def", Callback {arity: 2, func: handle_def});
         map
     };
 }
@@ -115,4 +116,21 @@ fn handle_if(args: &[Token]) -> Result<Token> {
     } else {
         Ok(else_case)
     }
+}
+
+/// Defines a variable in the program, saving its data and value in the symbol table
+fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
+    check_arity(2, args.len())?;
+
+    let value = args[0].clone();
+    let name  = args[1].get_symbol()?;
+    let id = scope.id();
+    let sym_table = table
+        .get_mut(&id)
+        .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
+
+    // if the value already exists, rewrite it; if not, add it
+    sym_table.insert(name, value);
+
+    Ok(Token::Void)
 }
