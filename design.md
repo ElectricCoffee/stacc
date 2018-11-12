@@ -5,6 +5,47 @@ For anyone reading this, this is just meant to be my own design notes for the la
 The language is meant to be purely stack-based; no cheating allowed!
 Everything that happens in the language, must be applicable to a stack; so only pushing, popping, and appending is permitted.
 
+The general idea is to have everything be performed as stack operations without the need of any explicit pushing or popping; this will all be done by the operators that act on the stack.
+
+Example program:
+```
+72 to_rad # Pushes 1.257 to the stack
+duplicate # Pushes a copy of the top onto the stack
+cos 300 * # Take cos of the top of the stack and multiply the result by 300
+swap      # Swaps the two topmost elements
+sin 300 * # Take sin of the topmost element and multiply by 300
+"Coordinate is ({}, {})" print # Prints the 2 topmost elements
+```
+
+The benefit of using the stack, is that stack manipulations spring out naturally from this approach.
+
+Writing a number pushes it to the stack, writing an operator, pops the number off the stack, performs some operation on it, and pushes it back on.
+The main draw of this, is that it lets the programmer perform implicit operations on values already present.
+
+For example, writing `44 30 *` multiplies 44 by 30, but writing `20 +` adds 20 to whatever's already on the stack, and writing `+` simply adds together the top two items.
+By using a stack, results need not be assigned to a variable, they can simply exist on the stack until they are required.
+In the example program, `duplicate` copies the topmost value of the stack and pushes another copy of the value on top. 
+The original value remains untouched until needed later.
+
+Observe:
+```
+72 to_rad                      # operation: 72,        stack: [72]
+                               # operation: to_rad,    stack: [1.257]
+duplicate                      # operation: duplicate, stack: [1.257, 1.257]
+cos 300 *                      # operation: cos,       stack: [1.257, 0.309]
+                               # operation: 300,       stack: [1.257, 0.309, 300]
+                               # operation: *,         stack: [1.257, 92.71]
+swap                           # operation: swap,      stack: [92.71, 1.257]
+sin 300 *                      # operation: sin,       stack: [92.71, 0.951]
+                               # operation: 300,       stack: [92.71, 0.951, 300]
+                               # operation: *,         stack: [92.71, 285.3]
+"Coordinate is ({}, {})" print # operation: "Coor...", stack: [92.71, 285.3, "Coordinate is ({}, {})"]
+                               # operation: print,     stack: []
+```
+
+I have attempted to annotate each line of the program with the results of the stack operations. 
+Everything following a `#` is a comment, and is not parsed by the interpreter.
+
 ### Variables
 Variables are of course present in the language, and they (sorta) break the stackiness of the language.
 They can be thought of as registers in assembly, where if you need something to be stored independently of the stack, they'd be the way to go.
