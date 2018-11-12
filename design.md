@@ -144,6 +144,46 @@ This in turn can also be done in two ways:
 
 Both of the approaches can be simplified if the language switches to a two-pass interpreter.
 
+#### Finding the Parent's Parent
+I stumbled upon a roadblock: If a scope is nested two levels, how do we find the parent's parent?
+After all, while scopes can be arbitrarily nested on paper, by the virtue of how the data structure is designed, they can't in practice.
+
+A parent can get a reference to its child via the symbol table, but a child can't get a reference to its parent, only its parent's symbol table.
+This means a child can get a reference to itself and its siblings, but not its parent.
+As such, children don't have access to their parent's parent because the parent ID isn't stored in the symbol table, it's stored in the parent object.
+
+To solve this, I can do one of two things:
+1. I can try to make the object hierarchy more like the way a filesystem does it: a folder has a reference to itself, its parent, and all its children,
+2. I can add a special symbol in the symbol table, called something like `$$PARENT$$`, which stores the parent ID if any.
+
+The benefit of the references is that it on paper seems to be the most sane solution; 
+however, with Rust's borrow checker and lifetimes, it'll most likely lead to `Rc` hell instead.
+
+The benefit of the special entry however, essentially means I can stay within the lookup table entirely, without having to worry about referencing any of the other children.
+Granted, this method is potentially much less efficient, as it potentially requires the parser to repeatedly check the symbol table to find the value.
+This problem is undecidable, since there's a possibility a scope could set itself as the parent, causing an infinite loop.
+
+Why would I want to look up a parent's parent though?
+Simple: To find a variable.
+Given that scopes can be nested, I have to be able to find the variable in the right scope.
+This essentially means traversing the symbol table looking for the entry.
+Since the variable could be mentioned 80 scopes in, the interpreter needs to be able to handle finding it.
+
+Using the example from before, now with the new entry:
+
+```yaml
+5eff1f4b: # main scope
+    $a: 13
+    $inner_scope: # the same inner scope as above, here defined as a variable
+        parent: Some(5eff1f4b)
+        id: 6ddf29b8
+        stack: [2, pi, *, $a, $b, -, +]
+6ddf29b8:
+    $$PARENT$$: 5eff1f4b
+    $b: 45
+```
+It's clear that looking up the parent of `6ddf29b8` only requires the interpreter to find the `$$PARENT$$` entry, and not the actual reference to the object, which is inaccessible from that key.
+
 ### Conditionals
 As with any other programming language, conditionals are a must-have for the language.
 Though as one might expect, being stack-based leads to some interesting considerations:
