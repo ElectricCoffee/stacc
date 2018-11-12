@@ -184,6 +184,13 @@ Using the example from before, now with the new entry:
 ```
 It's clear that looking up the parent of `6ddf29b8` only requires the interpreter to find the `$$PARENT$$` entry, and not the actual reference to the object, which is inaccessible from that key.
 
+**PROBLEM:** How do I repeatedly iterate through the symbol table in a safe, sane, and reliable way that agrees with Rust's borrow checker?
+
+Possible solutions:
+* Clever application of a loop (possible solution [[here](https://stackoverflow.com/a/37987197/1351298)]),
+* Using reference counting (yikes),
+* Recursion via a helper function of the form `fn(&mut ScopeTable, Uuid, String) -> Result<()>`.
+
 ### Conditionals
 As with any other programming language, conditionals are a must-have for the language.
 Though as one might expect, being stack-based leads to some interesting considerations:
