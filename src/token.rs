@@ -24,12 +24,26 @@ impl Token {
         }
     }
 
+    pub fn is_number(&self) -> bool {
+        match self {
+            Token::Number(_) => true,
+            _ => false,
+        }
+    }
+
     /// Attempts to get a token as a symbol string.
     /// If it fails, it returns an argument mismatch error.
     pub fn get_symbol(&self) -> Result<String> {
         match self {
             Token::Symbol(s) => Ok(s.clone()),
             _ => Err(Error::ArgumentMismatch),
+        }
+    }
+
+    pub fn is_symbol(&self) -> bool {
+        match self {
+            Token::Symbol(_) => true,
+            _ => false,
         }
     }
 
@@ -42,6 +56,13 @@ impl Token {
         }
     }
 
+    pub fn is_string(&self) -> bool {
+        match self {
+            Token::String(_) => true,
+            _ => false,
+        }
+    }
+
     /// Attempts to get a token as a scope.
     /// If it fails, it returns an argument mismatch error.
     pub fn get_scope(&self) -> Result<Scope> {
@@ -51,12 +72,26 @@ impl Token {
         }
     }
 
+    pub fn is_scope(&self) -> bool {
+        match self {
+            Token::Scope(_) => true,
+            _ => false,
+        }
+    }
+
     /// Attempts to get a token as a boolean.
     /// If it fails, it returns an argument mismatch error.
     pub fn get_boolean(&self) -> Result<bool> {
         match self {
             Token::Boolean(b) => Ok(*b),
             _ => Err(Error::ArgumentMismatch),
+        }
+    }
+
+    pub fn is_boolean(&self) -> bool {
+        match self {
+            Token::Boolean(_) => true,
+            _ => false,
         }
     }
 }
