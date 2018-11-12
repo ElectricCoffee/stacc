@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use std::ops::*; // adds math operations to f64
 use token::{Stack, Token};
 use error::{Error, Result};
+use scope::Scope;
+use tables::ScopeTable;
 
-type Bif = fn(&[Token]) -> Result<Token>; // short for Built-In Function
+type Bif = fn(&mut ScopeTable, &mut Scope, &[Token]) -> Result<Token>; // short for Built-In Function
 
 pub struct Callback {
     pub arity: usize,
@@ -13,35 +15,39 @@ pub struct Callback {
 lazy_static! {
     pub static ref BIFS: HashMap<&'static str, Callback> = {
         let mut map: HashMap<&'static str, Callback> = HashMap::new();
-        map.insert("+",   Callback { arity: 2, func: |args| apply_num_binop(args, f64::add)});
-        map.insert("-",   Callback { arity: 2, func: |args| apply_num_binop(args, f64::sub)});
-        map.insert("*",   Callback { arity: 2, func: |args| apply_num_binop(args, f64::mul)});
-        map.insert("/",   Callback { arity: 2, func: |args| apply_num_binop(args, f64::div)});
-        map.insert("neg", Callback { arity: 1, func: |args| apply_num_unop(args, f64::neg)});
-        map.insert("sin", Callback { arity: 1, func: |args| apply_num_unop(args, f64::sin)});
-        map.insert("cos", Callback { arity: 1, func: |args| apply_num_unop(args, f64::cos)});
-        map.insert("tan", Callback { arity: 1, func: |args| apply_num_unop(args, f64::tan)});
+        map.insert("+",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add)});
+        map.insert("-",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::sub)});
+        map.insert("*",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::mul)});
+        map.insert("/",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::div)});
+        map.insert("neg", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::neg)});
+        map.insert("sin", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::sin)});
+        map.insert("cos", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::cos)});
+        map.insert("tan", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan)});
         //map.insert("copy", |args| )
-        map.insert("if", Callback { arity: 3, func: handle_if});
+        map.insert("if", Callback { arity: 3, func: |_, _, args| handle_if(args)});
         map
     };
 }
 
 /// Parses an n-ary operator
-pub fn parse_symbol(stack: &mut Stack, symbol: &str) -> Result<()> {
+/// Parameters: 
+/// - `table` is the global scope table containing each scope's symbol tables
+/// - `scope` is the current scope
+/// - `symbol` is the symbol that needs parsing
+pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<()> {
     // get the callback stored in BIFS, if available
     let callback = BIFS.get(symbol).ok_or(Error::UnknownIdentifier)?;
 
     let mut args = Vec::new();
 
     // if the arity is greater than the available data, error
-    if stack.len() < callback.arity {
+    if scope.stack.len() < callback.arity {
         return Err(Error::ArityMismatch);
     }
 
     // add the required number of tokens to the args vector
     for _ in 0 .. callback.arity {
-        let token = stack.pop_back().unwrap();
+        let token = scope.stack.pop_back().unwrap();
         args.push(token);
     };
 
@@ -49,7 +55,7 @@ pub fn parse_symbol(stack: &mut Stack, symbol: &str) -> Result<()> {
 
     // call the inner function
     let fun = callback.func;
-    let result = fun(&args)?;
+    let result = fun(table, scope, &args)?;
 
     // if the result is a scope, append it to the stack instead of pushing it
     if let Token::Scope(mut result_stack) = result {
@@ -57,7 +63,7 @@ pub fn parse_symbol(stack: &mut Stack, symbol: &str) -> Result<()> {
     }
     // if the result isn't a void, add the result to the stack
     else if result != Token::Void {
-        stack.push_back(result);
+        scope.stack.push_back(result);
     }
 
     Ok(())
