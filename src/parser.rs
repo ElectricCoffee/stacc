@@ -26,6 +26,7 @@ lazy_static! {
         //map.insert("copy", |args| )
         map.insert("if", Callback { arity: 3, func: |_, _, args| handle_if(args)});
         map.insert("def", Callback {arity: 2, func: handle_def});
+        // map.insert("set", Callback {arity: 2, func: handle_set});
         map
     };
 }
@@ -131,6 +132,22 @@ fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
 
     // if the value already exists, rewrite it; if not, add it
     sym_table.insert(name, value);
+
+    Ok(Token::Void)
+}
+
+fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
+    check_arity(2, args.len())?;
+
+    let value = args[0].clone();
+    let name  = args[1].get_symbol()?;
+    let id = scope.id();
+    let sym_table = table
+        .get_mut(&id)
+        .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
+
+    // if an entry exists, update it
+    // TODO: Deal with this later.
 
     Ok(Token::Void)
 }
