@@ -2,6 +2,7 @@ use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
 use token::Stack;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
     parent: Option<Uuid>,
     id: Uuid,
