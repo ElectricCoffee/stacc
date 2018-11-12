@@ -1,0 +1,13 @@
+name: The Stacc Programming Language
+version: "1.0"
+author: Niko L. <slench102+git@gmail.com>
+about: Interpreter for the Stacc programming language
+args:
+    - INPUT:
+        help: The Stacc file you want to parse
+        required: true
+        index: 1
+    - verbose:
+        short: v
+        long: verbose
+        help: Prints verbose error messages
