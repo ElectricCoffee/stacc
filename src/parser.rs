@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::ops::*; // adds math operations to f64
-use token::{Stack, Token};
+use token::{Token};
 use error::{Error, Result};
 use scope::Scope;
-use tables::ScopeTable;
+use tables::{self, ScopeTable};
 
 type Bif = fn(&mut ScopeTable, &mut Scope, &[Token]) -> Result<Token>; // short for Built-In Function
 
@@ -26,7 +26,7 @@ lazy_static! {
         //map.insert("copy", |args| )
         map.insert("if", Callback { arity: 3, func: |_, _, args| handle_if(args)});
         map.insert("def", Callback {arity: 2, func: handle_def});
-        // map.insert("set", Callback {arity: 2, func: handle_set});
+        map.insert("set", Callback {arity: 2, func: handle_set});
         map
     };
 }
@@ -136,18 +136,17 @@ fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
     Ok(Token::Void)
 }
 
+/// Handles setting a new value to a given symbol
 fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
     check_arity(2, args.len())?;
 
     let value = args[0].clone();
     let name  = args[1].get_symbol()?;
     let id = scope.id();
-    let sym_table = table
-        .get_mut(&id)
-        .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
 
-    // if an entry exists, update it
-    // TODO: Deal with this later.
+    let sym_table = tables::find_symbol(table, id, &name)?;
+
+    sym_table.insert(name, value);
 
     Ok(Token::Void)
 }
