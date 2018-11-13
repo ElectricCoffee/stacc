@@ -64,7 +64,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         //stack.append(&mut result_stack); // TODO: FIX THIS
     }
     // if the result isn't a void, add the result to the stack
-    else if result != Token::Void {
+    else if !result.is_void() {
         scope.stack.push_back(result);
     }
 

@@ -113,4 +113,27 @@ impl Token {
             _ => false,
         }
     }
+
+        /// Attempts to get a token as a boolean.
+    /// If it fails, it returns an argument mismatch error.
+    pub fn get_id(&self) -> Result<Uuid> {
+        match self {
+            Token::Id(i) => Ok(*i),
+            _ => Err(Error::ArgumentMismatch),
+        }
+    }
+
+    pub fn is_id(&self) -> bool {
+        match self {
+            Token::Id(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_void(&self) -> bool {
+        match self {
+            Token::Void => true,
+            _ => false,
+        }
+    }
 }
