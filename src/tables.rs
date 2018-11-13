@@ -47,7 +47,7 @@ pub fn lookup(table: &mut ScopeTable, id: Uuid, symbol: &str) -> Lookup {
 
 /// Tries to find the symbol table in which a given symbol is located, regardless of depth.
 /// If successful, it returns a mutable reference to the given symbol table, if not it returns `Error::UnknownIdentifier`
-pub fn find_symbol<'a, 'b>(table: &'a mut ScopeTable, id: Uuid, symbol: &'b str) -> Result<&'a mut SymbolTable> {
+pub fn find_symbol<'a>(table: &'a mut ScopeTable, id: Uuid, symbol: &str) -> Result<&'a mut SymbolTable> {
     use tables::Lookup::*;
 
     match lookup(table, id, symbol) {
