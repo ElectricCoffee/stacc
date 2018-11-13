@@ -36,7 +36,7 @@ pub fn lookup(table: &mut ScopeTable, id: Uuid, symbol: &str) -> Lookup {
         .get_mut(&id)
         .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
 
-    if symbol_table.get(symbol).is_some() {
+    if symbol_table.contains_key(symbol) {
         Found(id)
     } else if let Some(parent_id) = get_parent_id(symbol_table) {
         CheckParent(parent_id)
