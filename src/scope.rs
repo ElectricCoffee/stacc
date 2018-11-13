@@ -2,6 +2,8 @@ use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
 use token::{Token, Stack};
 
+pub const PARENT: &'static str = "$$PARENT$$";
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
     parent: Option<Uuid>,
@@ -24,7 +26,7 @@ impl Scope {
         // if the scope has a parent, add special $$PARENT$$ entry 
         // so the parent can be referenced from the symbol table
         if let Some(parent_id) = parent {
-            table_entry.insert("$$PARENT$$".into(), Token::Id(parent_id));
+            table_entry.insert(PARENT.into(), Token::Id(parent_id));
         }
 
         scopes.insert(id, table_entry);
