@@ -232,6 +232,73 @@ Possible solutions:
 * Using reference counting (yikes),
 * Recursion via a helper function of the form `fn(&mut ScopeTable, Uuid, String) -> Result<()>`.
 
+#### The Issue of Namespace Resolution During Variable Declaration
+Put simply, given an expression like `45 $angle def`, there's nothing that prevents the interpreter from looking up `$angle` in the symbol table, and replacing it with the existing value within the table.
+Most languages seem to deal with this fairly well without any issues, as they let the programmer define nested variables as they please.
+
+Consider the following examples:
+
+```c
+// C/C++
+int foo() {
+    int a = 5;
+    int b = 5;
+    int bar() {
+        a = 18;
+    }
+    bar();
+    return a + b;
+}
+```
+```python
+# Python
+def foo():
+    a = 5
+    b = 5
+    def bar():
+        a = 18
+    bar()
+    return a + b
+```
+```ruby
+# Ruby
+def foo()
+    a = 5
+    b = 5
+    def bar()
+        a = 18
+    end
+    bar()
+    return a + b
+end
+```
+In the C/C++ case, we define a nested function, which sets the local variable a to be 18; running `foo()` will give back the number 23.
+However, in the Python and Ruby cases, neither of which use a specific keyword for defining variables, the `a` set in the inner function does _not_ reference the `a` in the outer scope, so both languages will return 10 upon calling `foo()`.
+
+This difference is important, because it essentially showcases two different approaches to the same thing: Either variable assignment/definition obeys scoping rules, or they don't.
+Now, in most cases, defining a nested inner function is going to be rare, so the Python/Ruby folk will likely get away with this most of the time.
+
+Why am I bringing this up? Well, either I could go the Ruby and Python route, and say that whenever I encounter a variable in an inner scope, I'm simply not going to care whether or not it exists in the outer scope; namespace resolution will not happen, because it's the first time the variable is defined.
+However, I like the idea of being able to reference a previously defined variable within my functions, as it gives rise to some more interesting programming patterns.
+
+Now, in this language, we _do_ use a special keyword for defining variables, `def`; the main issue arises from the stack-based nature of how the language is read.
+In C the keyword comes before the variable name, so had the language been interpreted the interpreter would be able to see that the keyword that follows shouldn't be looked up, only defined.
+We do not have this luxury here.
+The variable name is read _before_ the `def` keyword, and as such there's no logical way of avoiding namespace resolution, unless I'm planning on tagging variables with metadata about their variable of origin.
+Doing that would let the `def` keyword look up the origin and reassign the value.
+This approach however, feels extremely clunky, and would require every token in the interpreter be of the form `Kind(Data, Option<Origin>)`.
+
+There are two languages that spring to mind that solve this issue in a rather interesting way: _Bash_ and _PostScript_.
+
+In both of these languages, variable declaration differs from variable calls in that they either add or remove a symbol.
+in Bash you write `FOO=bar` which declares a variable called `$FOO`, which adds the `$`.
+In PostScript you write `/foo bar def`, which defines a variable called `foo` without the `/`.
+
+My best guess for PostScript would be that it suffers the same issue this does, so it uses the `/` to tell the interpreter to not evaluate the symbol and wait for the `def` keyword.
+
+The issue remains to find a syntax that isn't too awkward or hard to understand.
+I want to keep the `$` prefix, for the reasons mentioned in the _Variables_ section.
+
 ### Conditionals
 As with any other programming language, conditionals are a must-have for the language.
 Though as one might expect, being stack-based leads to some interesting considerations:
