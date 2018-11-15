@@ -4,10 +4,17 @@ use token::{Token, Stack};
 
 pub const PARENT: &'static str = "$$PARENT$$";
 
+/// Stores all the information needed within a scope
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
+    /// Optional parent-ID. 
+    /// A None assumes the scope is the root-scope.
     parent: Option<Uuid>,
+
+    /// The current scope's identifier.
     id: Uuid,
+
+    /// The Scope's own local stack of symbols and values to execute.
     pub stack: Stack,
 }
 

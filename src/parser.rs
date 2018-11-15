@@ -5,11 +5,13 @@ use error::{Error, Result};
 use scope::Scope;
 use tables::{self, ScopeTable};
 
-type Bif = fn(&mut ScopeTable, &mut Scope, &[Token]) -> Result<Token>; // short for Built-In Function
-
+/// Handles encoding callback information, with the arity size of the function that it expects
 pub struct Callback {
+    /// Encodes the callback's arity -- its number of arguments.
     pub arity: usize,
-    pub func: Bif,
+    /// Encodes the built-in function type. 
+    /// Designed to be as generic as possible, to accomodate the widest range of functions. 
+    pub func: fn(&mut ScopeTable, &mut Scope, &[Token]) -> Result<Token>,
 }
 
 lazy_static! {

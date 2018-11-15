@@ -17,6 +17,7 @@ pub enum Lookup {
     NotFound,
 }
 
+/// Gets the parent ID of the current symbol table if it exists
 pub fn get_parent_id(table: &SymbolTable) -> Option<Uuid> {
     if let Some(Token::Id(id)) = table.get(scope::PARENT) {
         Some(*id)
