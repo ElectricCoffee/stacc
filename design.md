@@ -299,6 +299,17 @@ My best guess for PostScript would be that it suffers the same issue this does, 
 The issue remains to find a syntax that isn't too awkward or hard to understand.
 I want to keep the `$` prefix, for the reasons mentioned in the _Variables_ section.
 
+**DECISION:** I have decided to have variable declaration and invocation follow the _Bash_ way of doing things, meaning
+```
+42 meaning def
+```
+will define the variable assuming there's no pre-existing keyword with that name, and writing `$meaning` will invoke it.
+It solves several problems:
+1. There's no need for some ugly prefix syntax like `#foo` or `:foo` that stands out for defining the variable, which would lead to the fun situation of `$foo 1 + #foo set` being a required syntax for updating.
+2. I don't have to define 3 different kinds of symbols in my code, each to handle a separate usecase, now everything can piggyback on the same infrastructure. Granted, this may change later.
+
+It does however come with a significant con though: writing something like `foo bar baz` is now legal syntax, because all it does is push unevaluated keywords onto the stack.
+
 ### Conditionals
 As with any other programming language, conditionals are a must-have for the language.
 Though as one might expect, being stack-based leads to some interesting considerations:
