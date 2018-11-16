@@ -7,8 +7,6 @@ Make this a single-pass interpreter if possible.
 
 ## Preliminary Example 
 ```
-Math import
-
 72 to_rad # Pushes 1.257 to the stack
 duplicate # Pushes a copy of the top onto the stack
 cos 300 * # Take cos of the top of the stack and multiply the result by 300
