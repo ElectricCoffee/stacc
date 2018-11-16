@@ -135,6 +135,8 @@ fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
         .get_mut(&id)
         .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
 
+    let name = format!("${}", name); // prefix $ onto the name to mark it as a variable
+
     // if the value already exists, rewrite it; if not, add it
     sym_table.insert(name, value);
 
