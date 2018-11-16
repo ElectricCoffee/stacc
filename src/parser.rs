@@ -74,6 +74,8 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         let token = handle_invoke(table, scope, symbol)?;
         if let Token::Scope(mut result_scope) = token {
             // deal with scope context switching here if the value is a scope.
+        } else {
+            scope.stack.push_back(token);
         }
     }
     // if the symbol is not a valid keyword, assume it's a variable name and add it to the stack 
