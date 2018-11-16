@@ -40,34 +40,37 @@ lazy_static! {
 /// - `symbol` is the symbol that needs parsing
 pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<()> {
     // get the callback stored in BIFS, if available
-    let callback = BIFS.get(symbol).ok_or(Error::UnknownIdentifier)?;
+    if let Some(callback) = BIFS.get(symbol) {
+        let mut args = Vec::new();
 
-    let mut args = Vec::new();
+        // if the arity is greater than the available data, error
+        if scope.stack.len() < callback.arity {
+            return Err(Error::ArityMismatch);
+        }
 
-    // if the arity is greater than the available data, error
-    if scope.stack.len() < callback.arity {
-        return Err(Error::ArityMismatch);
+        // add the required number of tokens to the args vector
+        for _ in 0 .. callback.arity {
+            let token = scope.stack.pop_back().unwrap();
+            args.push(token);
+        };
+
+        args.reverse(); // ensure the args appear in the right order
+
+        // call the inner function
+        let fun = callback.func;
+        let result = fun(table, scope, &args)?;
+
+        // if the result is a scope, append it to the stack instead of pushing it
+        if let Token::Scope(mut result_scope) = result {
+            // deal with scope context switching here if the value is a scope.
+        }
+        // if the result isn't a void, add the result to the stack
+        else if !result.is_void() {
+            scope.stack.push_back(result);
+        }
     }
-
-    // add the required number of tokens to the args vector
-    for _ in 0 .. callback.arity {
-        let token = scope.stack.pop_back().unwrap();
-        args.push(token);
-    };
-
-    args.reverse(); // ensure the args appear in the right order
-
-    // call the inner function
-    let fun = callback.func;
-    let result = fun(table, scope, &args)?;
-
-    // if the result is a scope, append it to the stack instead of pushing it
-    if let Token::Scope(mut result_stack) = result {
-        //stack.append(&mut result_stack); // TODO: FIX THIS
-    }
-    // if the result isn't a void, add the result to the stack
-    else if !result.is_void() {
-        scope.stack.push_back(result);
+    else {
+        scope.stack.push_back(Token::Symbol(symbol.into()));
     }
 
     Ok(())
