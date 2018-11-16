@@ -13,7 +13,11 @@ pub enum Token {
     Scope(Scope),   // Used for nested scopes, (...)
     List(Stack),    // Used for lists, [...]
     Boolean(bool),  // Used for booleans, true and false
-    Id(Uuid),
+    Id(Uuid),       // Used to store the UUID of a scope
+    BeginScope,     // Matches the ( token
+    EndScope,       // Matches the ) token
+    BeginList,      // Matches the [ token
+    EndList,        // Matches the ] token
     Void,           // Used for operations that don't produce any results
 }
 
