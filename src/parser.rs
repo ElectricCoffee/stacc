@@ -69,6 +69,14 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
             scope.stack.push_back(result);
         }
     }
+    // if the first character in a symbol name is a $, assume it's a variable invocation
+    else if let Some("$") = symbol.get(..= 0) {
+        let token = handle_invoke(table, scope, symbol)?;
+        if let Token::Scope(mut result_scope) = token {
+            // deal with scope context switching here if the value is a scope.
+        }
+    }
+    // if the symbol is not a valid keyword, assume it's a variable name and add it to the stack 
     else {
         scope.stack.push_back(Token::Symbol(symbol.into()));
     }
@@ -156,4 +164,14 @@ fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
     sym_table.insert(name, value);
 
     Ok(Token::Void)
+}
+
+/// Finds a variable in the symbol table if it's available; if not it returns an error
+fn handle_invoke(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<Token> {
+    let id = scope.id();
+    let sym_table = tables::find_symbol(table, id, symbol)?;
+
+    let result = sym_table.get(symbol).unwrap().to_owned();
+
+    Ok(result)
 }
