@@ -70,7 +70,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         }
     }
     // if the first character in a symbol name is a $, assume it's a variable invocation
-    else if let Some("$") = symbol.get(..= 0) {
+    else if symbol.starts_with("$") {
         let token = handle_invoke(table, scope, symbol)?;
         if let Token::Scope(mut result_scope) = token {
             // deal with scope context switching here if the value is a scope.
