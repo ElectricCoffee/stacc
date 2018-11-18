@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::ops::*; // adds math operations to f64
-use token::{Token};
+use token::Token;
 use error::{Error, Result};
 use scope::Scope;
 use tables::{self, ScopeTable};
@@ -17,18 +17,18 @@ pub struct Callback {
 lazy_static! {
     pub static ref BIFS: HashMap<&'static str, Callback> = {
         let mut map: HashMap<&'static str, Callback> = HashMap::new();
-        map.insert("+",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add)});
-        map.insert("-",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::sub)});
-        map.insert("*",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::mul)});
-        map.insert("/",   Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::div)});
-        map.insert("neg", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::neg)});
-        map.insert("sin", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::sin)});
-        map.insert("cos", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::cos)});
-        map.insert("tan", Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan)});
-        //map.insert("copy", |args| )
-        map.insert("if", Callback { arity: 3, func: |_, _, args| handle_if(args)});
-        map.insert("def", Callback {arity: 2, func: handle_def});
-        map.insert("set", Callback {arity: 2, func: handle_set});
+        map.insert("+",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add)});
+        map.insert("-",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::sub)});
+        map.insert("*",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::mul)});
+        map.insert("/",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::div)});
+        map.insert("neg",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::neg)});
+        map.insert("sin",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::sin)});
+        map.insert("cos",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::cos)});
+        map.insert("tan",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan)});
+        map.insert("copy", Callback { arity: 0, func: |_, scope, _| handle_duplicate(scope)});
+        map.insert("if",   Callback { arity: 3, func: |_, _, args| handle_if(args)});
+        map.insert("def",  Callback { arity: 2, func: handle_def});
+        map.insert("set",  Callback { arity: 2, func: handle_set});
         map
     };
 }
@@ -116,6 +116,13 @@ fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
     let result = func(a);
 
     Ok(Token::Number(result))
+}
+
+/// Duplicates the topmost element on the stack and returns it.
+/// Technically a 0-arity function, as it doesn't consume anything on the stack
+fn handle_duplicate(scope: &mut Scope) -> Result<Token> {
+    let duplicate = scope.stack.back().ok_or(Error::EmptyStack)?.clone();
+    Ok(duplicate)
 }
 
 /// Applies an if-statement operation and returns the corresponding token
