@@ -14,6 +14,7 @@ mod token;
 mod error;
 mod scope;
 mod tables;
+mod callback;
 
 fn read_file(matches: clap::ArgMatches) -> io::Result<String> {
     use io::{self, ErrorKind, Read};
