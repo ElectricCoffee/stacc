@@ -6,4 +6,5 @@ pub enum Error {
     ArgumentMismatch, 
     UnknownIdentifier,
     ArityMismatch,
+    EmptyStack,
 }
