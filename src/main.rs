@@ -6,6 +6,7 @@ extern crate lazy_static;
 extern crate uuid;
 #[macro_use]
 extern crate clap;
+extern crate regex;
 
 #[cfg(test)] mod test;
 mod lexer;
