@@ -121,8 +121,7 @@ fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
 /// Duplicates the topmost element on the stack and returns it.
 /// Technically a 0-arity function, as it doesn't consume anything on the stack
 fn handle_duplicate(scope: &mut Scope) -> Result<Token> {
-    let duplicate = scope.stack.back().ok_or(Error::EmptyStack)?.clone();
-    Ok(duplicate)
+    scope.stack.back().cloned().ok_or(Error::EmptyStack)
 }
 
 /// Applies an if-statement operation and returns the corresponding token
