@@ -71,16 +71,3 @@ fn test_if() {
 
     assert_eq!(expected_res, res);
 }
-
-#[test]
-fn test_lookup() {
-    // setup
-    let mut scopes = tables::ScopeTable::new();
-    let mut main_scope = scope::Scope::new(&mut scopes, None);
-
-    main_scope.stack = Vec::new().into(); // doesn't need to contain anything
-    let res = parser::parse_symbol(&mut scopes, &mut main_scope, "sdfjhsdjklfdskjhf"); // definitely invalid token
-    let expected_res = Err(Error::UnknownIdentifier);
-
-    assert_eq!(expected_res, res);
-}
