@@ -14,6 +14,18 @@ pub struct Callback {
     pub func: fn(&mut ScopeTable, &mut Scope, &[Token]) -> Result<Token>,
 }
 
+impl Callback {
+    /// Invokes the callback's internal function
+    pub fn invoke(&self, table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
+        if self.arity != args.len() {
+            return Err(Error::ArityMismatch);
+        }
+
+        let fun = self.func;
+        fun(table, scope, args)
+    }
+}
+
 lazy_static! {
     pub static ref BIFS: HashMap<&'static str, Callback> = {
         let mut map: HashMap<&'static str, Callback> = HashMap::new();
@@ -57,8 +69,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         args.reverse(); // ensure the args appear in the right order
 
         // call the inner function
-        let fun = callback.func;
-        let result = fun(table, scope, &args)?;
+        let result = callback.invoke(table, scope, &args)?;
 
         // if the result is a scope, append it to the stack instead of pushing it
         if let Token::Scope(mut result_scope) = result {
@@ -86,20 +97,8 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
     Ok(())
 }
 
-/// Checks if the expected arity matches the actual one.
-/// Returns Error::ArityMismatch if it doesn't, and nothing if all is fine.
-fn check_arity(expected: usize, actual: usize) -> Result<()> {
-    if actual == expected {
-        Ok(())
-    } else {
-        Err(Error::ArityMismatch)
-    }
-}
-
 /// Applies a binary numeric operation and returns the resulting token.
 fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
-    check_arity(2, args.len())?;
-
     let a = args[0].get_number()?;
     let b = args[1].get_number()?;
 
@@ -110,8 +109,6 @@ fn apply_num_binop(args: &[Token], func: fn(f64, f64) -> f64) -> Result<Token> {
 
 /// Applies a unary numeric operation and returns the resulting token.
 fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
-    check_arity(1, args.len())?;
-
     let a = args[0].get_number()?;
     let result = func(a);
 
@@ -126,8 +123,6 @@ fn handle_duplicate(scope: &mut Scope) -> Result<Token> {
 
 /// Applies an if-statement operation and returns the corresponding token
 fn handle_if(args: &[Token]) -> Result<Token> {
-    check_arity(3, args.len())?;
-
     // if-statements are written [then] [else] cond if
     let then_case = args[0].clone();
     let else_case = args[1].clone();
@@ -142,8 +137,6 @@ fn handle_if(args: &[Token]) -> Result<Token> {
 
 /// Defines a variable in the program, saving its data and value in the symbol table
 fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
-    check_arity(2, args.len())?;
-
     let value = args[0].clone();
     let name  = args[1].get_symbol()?;
     let id = scope.id();
@@ -161,8 +154,6 @@ fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
 
 /// Handles setting a new value to a given symbol
 fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Result<Token> {
-    check_arity(2, args.len())?;
-
     let value = args[0].clone();
     let name  = args[1].get_symbol()?;
     let id = scope.id();
