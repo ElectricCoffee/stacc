@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use token::{Token};
 use error::{Result, Error};
-use scope;
+use scope::{self, Scope};
 
 /// Stores the name of a symbol and the associated data stored within
 pub type SymbolTable = HashMap<String, Token>;
@@ -35,7 +35,7 @@ pub fn lookup(table: &mut ScopeTable, id: Uuid, symbol: &str) -> Lookup {
 
     let symbol_table = table
         .get_mut(&id)
-        .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
+        .unwrap_or_else(|| Scope::invalid_id_panic(id));
 
     if symbol_table.contains_key(symbol) {
         Found(id)

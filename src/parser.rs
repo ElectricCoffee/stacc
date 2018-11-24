@@ -9,18 +9,18 @@ use callback::Callback;
 lazy_static! {
     pub static ref BIFS: HashMap<&'static str, Callback> = {
         let mut map: HashMap<&'static str, Callback> = HashMap::new();
-        map.insert("+",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add)});
-        map.insert("-",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::sub)});
-        map.insert("*",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::mul)});
-        map.insert("/",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::div)});
-        map.insert("neg",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::neg)});
-        map.insert("sin",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::sin)});
-        map.insert("cos",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::cos)});
-        map.insert("tan",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan)});
-        map.insert("copy", Callback { arity: 0, func: |_, scope, _| handle_duplicate(scope)});
-        map.insert("if",   Callback { arity: 3, func: |_, _, args| handle_if(args)});
-        map.insert("def",  Callback { arity: 2, func: handle_def});
-        map.insert("set",  Callback { arity: 2, func: handle_set});
+        map.insert("+",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add) });
+        map.insert("-",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::sub) });
+        map.insert("*",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::mul) });
+        map.insert("/",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::div) });
+        map.insert("neg",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::neg) });
+        map.insert("sin",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::sin) });
+        map.insert("cos",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::cos) });
+        map.insert("tan",  Callback { arity: 1, func: |_, _, args| apply_num_unop(args, f64::tan) });
+        map.insert("copy", Callback { arity: 0, func: |_, scope, _| handle_duplicate(scope) });
+        map.insert("if",   Callback { arity: 3, func: |_, _, args| handle_if(args) });
+        map.insert("def",  Callback { arity: 2, func: handle_def });
+        map.insert("set",  Callback { arity: 2, func: handle_set });
         map
     };
 }
@@ -61,7 +61,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         }
     }
     // if the first character in a symbol name is a $, assume it's a variable invocation
-    else if symbol.starts_with("$") {
+    else if symbol.starts_with('$') {
         let token = handle_invoke(table, scope, symbol)?;
         if let Token::Scope(mut result_scope) = token {
             // deal with scope context switching here if the value is a scope.
@@ -122,7 +122,7 @@ fn handle_def(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
     let id = scope.id();
     let sym_table = table
         .get_mut(&id)
-        .expect(&format!("Scope ID {} not present in scope table. This should not happen.", id));
+        .unwrap_or_else(|| Scope::invalid_id_panic(id));
 
     let name = format!("${}", name); // prefix $ onto the name to mark it as a variable
 

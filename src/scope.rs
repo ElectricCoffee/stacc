@@ -2,7 +2,7 @@ use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
 use token::{Token, Stack};
 
-pub const PARENT: &'static str = "$$PARENT$$";
+pub const PARENT: &str = "$$PARENT$$";
 
 /// Stores all the information needed within a scope
 #[derive(Debug, Clone, PartialEq)]
@@ -40,7 +40,7 @@ impl Scope {
 
         Scope {
             parent,
-            id: id,
+            id,
             stack: Stack::new(),
         }
     }
@@ -58,5 +58,14 @@ impl Scope {
     /// Gets the ID of the current scope
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    /// Panics given the invalid ID `id`.
+    /// Only to be used in cases where undesired behaviour would occur.
+    pub fn invalid_id_panic(id: Uuid) -> ! {
+        panic!(
+            "Scope ID {} not present in scope table. This should not happen.",
+            id
+        )
     }
 }
