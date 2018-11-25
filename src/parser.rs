@@ -54,6 +54,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         // if the result is a scope, append it to the stack instead of pushing it
         if let Token::Scope(mut result_scope) = result {
             // deal with scope context switching here if the value is a scope.
+            unimplemented!();
         }
         // if the result isn't a void, add the result to the stack
         else if !result.is_void() {
@@ -65,6 +66,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         let token = handle_invoke(table, scope, symbol)?;
         if let Token::Scope(mut result_scope) = token {
             // deal with scope context switching here if the value is a scope.
+            unimplemented!();
         } else {
             scope.stack.push_back(token);
         }
