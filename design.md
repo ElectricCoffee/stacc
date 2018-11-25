@@ -166,9 +166,10 @@ Let us consider this simple code:
 ```
 we first define `$foo` to be a scoped variable, then on the very next line we have to resolve the name and expand it.
 
-There are two general approaches to do this: 
+There are three general approaches to do this: 
 1. Either we splice the result of `$foo` directly into the code, like this: `2 3 + 3 - 4 *`, 
 2. The code switches context to the scope, executes it, then returns back to the main scope without splicing anything.
+3. We don't have one scope, but instead a stack of scopes.
 
 **The first approach:** 
 It doesn't really adhere well to the stackiness of the program, as it somehow has to push the execution of the scope ahead of where it's gotten to.
@@ -183,7 +184,16 @@ This in turn can also be done in two ways:
 1. Have the parser simply call into the new scope, and return once done
 2. Have the parser save the name of the current scope before starting the execution of the new one, restoring the previous scope afterwards.
 
-Both of the approaches can be simplified if the language switches to a two-pass interpreter.
+**The third approach:**
+Instead of doing any strange jumping, we simply have a stack of scopes allocated somewhere.
+Once the scope is done executing it is popped off of the stack, and whatever value (or values) are left on that scope's stack, are appended to the stack of the surrounding scope.
+
+This approach solves 2 problems:
+1. Keeping track of the scope becomes a matter of simply reading the topmost stack frame
+2. Whatever values remain are treated as "results", which are then added to the parent scope. This does mean the programmer has to carefully clean the scope up before returning to avoid unnecessarily cluttering the parent stack, but that's a compromise I'm willing to take.
+
+All of the approaches can be simplified if the language switches to a two-pass interpreter.
+That is, a lexing step, followed by an execution step.
 
 #### Finding the Parent's Parent
 I stumbled upon a roadblock: If a scope is nested two levels, how do we find the parent's parent?
