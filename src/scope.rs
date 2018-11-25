@@ -2,6 +2,7 @@ use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
 use token::{Token, Stack};
 
+/// constant reference to the special value $$PARENT$$
 pub const PARENT: &str = "$$PARENT$$";
 
 /// Stores all the information needed within a scope
@@ -63,9 +64,6 @@ impl Scope {
     /// Panics given the invalid ID `id`.
     /// Only to be used in cases where undesired behaviour would occur.
     pub fn invalid_id_panic(id: Uuid) -> ! {
-        panic!(
-            "Scope ID {} not present in scope table. This should not happen.",
-            id
-        )
+        panic!("Scope ID {} not present in scope table. This should not happen.", id)
     }
 }

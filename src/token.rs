@@ -5,20 +5,33 @@ use uuid::Uuid;
 
 pub type Stack = VecDeque<Token>;
 
+/// The tokens that make up the programming lanugage
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    Number(f64),    // Keeps track of numeric values (May need to be replaced by a custom value) 1, 2.0, -3, etc.
-    Symbol(String), // Holds the names of symbols (subject to change) if, for, $a, $value, etc
-    String(String), // Holds strings, "you get the idea"
-    Scope(Scope),   // Used for nested scopes, (...)
-    List(Stack),    // Used for lists, [...]
-    Boolean(bool),  // Used for booleans, true and false
-    Id(Uuid),       // Used to store the UUID of a scope
-    BeginScope,     // Matches the ( token
-    EndScope,       // Matches the ) token
-    BeginList,      // Matches the [ token
-    EndList,        // Matches the ] token
-    Void,           // Used for operations that don't produce any results
+    /// Keeps track of numeric values (May need to be replaced by a custom value) 1, 2.0, -3, etc.
+    Number(f64),
+    /// Holds the names of symbols (subject to change) if, for, $a, $value, etc
+    Symbol(String),
+    /// Holds strings, "you get the idea"
+    String(String),
+    /// Used for nested scopes, (...)
+    Scope(Scope),
+    /// Used for lists, [...]
+    List(Stack),
+    /// Used for booleans, true and false
+    Boolean(bool),
+    /// Used to store the UUID of a scope
+    Id(Uuid),
+    /// Matches the ( token     
+    BeginScope,
+    /// Matches the ) token  
+    EndScope,
+    /// Matches the [ token
+    BeginList,
+    /// Matches the ] token
+    EndList,
+    /// Used for operations that don't produce any results
+    Void,
 }
 
 impl Token {

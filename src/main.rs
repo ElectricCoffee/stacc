@@ -10,13 +10,13 @@ extern crate clap;
 extern crate regex;
 
 #[cfg(test)] mod test;
-mod lexer;
-mod parser;
-mod token;
-mod error;
-mod scope;
-mod tables;
-mod callback;
+pub mod lexer;
+pub mod parser;
+pub mod token;
+pub mod error;
+pub mod scope;
+pub mod tables;
+pub mod callback;
 
 fn read_file(matches: &clap::ArgMatches) -> io::Result<String> {
     use io::{self, ErrorKind, Read};

@@ -12,8 +12,11 @@ pub type ScopeTable = HashMap<Uuid, SymbolTable>;
 
 /// Handles the three different symbol table lookup cases
 pub enum Lookup {
+    /// A lookup was successful at the given ID
     Found(Uuid),
+    /// The lookup failed, but the current scope has a parent with the given ID
     CheckParent(Uuid),
+    /// The lookup failed, and the current scope has no parent.
     NotFound,
 }
 

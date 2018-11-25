@@ -7,6 +7,8 @@ use tables::{self, ScopeTable};
 use callback::Callback;
 
 lazy_static! {
+    /// A collection of all the parser's built-in functions.
+    /// This collection includes mathematical operations, as well as if-statements, loops, and stack operations.
     pub static ref BIFS: HashMap<&'static str, Callback> = {
         let mut map: HashMap<&'static str, Callback> = HashMap::new();
         map.insert("+",    Callback { arity: 2, func: |_, _, args| apply_num_binop(args, f64::add) });
