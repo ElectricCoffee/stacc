@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::ops::*; // adds math operations to f64
 use token::Token;
 use error::{Error, Result};
-use scope::Scope;
+use scope::{Scope, StackFrames};
 use tables::{self, ScopeTable};
 use callback::Callback;
 
@@ -32,7 +32,8 @@ lazy_static! {
 /// - `table` is the global scope table containing each scope's symbol tables
 /// - `scope` is the current scope
 /// - `symbol` is the symbol that needs parsing
-pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<()> {
+pub fn parse_symbol(table: &mut ScopeTable, frames: &mut StackFrames, symbol: &str) -> Result<()> {
+    let scope = frames.last_mut().ok_or(Error::MissingScope)?;
     // get the callback stored in BIFS, if available
     if let Some(callback) = BIFS.get(symbol) {
         let mut args = Vec::new();
@@ -44,7 +45,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
 
         // add the required number of tokens to the args vector
         for _ in 0 .. callback.arity {
-            let token = scope.stack.pop_back().unwrap();
+            let token = scope.stack.pop().unwrap();
             args.push(token);
         };
 
@@ -60,7 +61,7 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
         }
         // if the result isn't a void, add the result to the stack
         else if !result.is_void() {
-            scope.stack.push_back(result);
+            scope.stack.push(result);
         }
     }
     // if the first character in a symbol name is a $, assume it's a variable invocation
@@ -70,12 +71,12 @@ pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> 
             // deal with scope context switching here if the value is a scope.
             unimplemented!();
         } else {
-            scope.stack.push_back(token);
+            scope.stack.push(token);
         }
     }
     // if the symbol is not a valid keyword, assume it's a variable name and add it to the stack 
     else {
-        scope.stack.push_back(Token::Symbol(symbol.into()));
+        scope.stack.push(Token::Symbol(symbol.into()));
     }
 
     Ok(())
@@ -102,7 +103,7 @@ fn apply_num_unop(args: &[Token], func: fn(f64) -> f64) -> Result<Token> {
 /// Duplicates the topmost element on the stack and returns it.
 /// Technically a 0-arity function, as it doesn't consume anything on the stack
 fn handle_duplicate(scope: &mut Scope) -> Result<Token> {
-    scope.stack.back().cloned().ok_or(Error::EmptyStack)
+    scope.stack.last().cloned().ok_or(Error::EmptyStack)
 }
 
 /// Applies an if-statement operation and returns the corresponding token
