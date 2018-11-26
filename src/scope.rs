@@ -1,3 +1,4 @@
+use std::fmt;
 use uuid::Uuid;
 use tables::{ScopeTable, SymbolTable};
 use token::{Token, Stack};
@@ -65,5 +66,11 @@ impl Scope {
     /// Only to be used in cases where undesired behaviour would occur.
     pub fn invalid_id_panic(id: Uuid) -> ! {
         panic!("Scope ID {} not present in scope table. This should not happen.", id)
+    }
+}
+
+impl fmt::Display for Scope {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "SCOPE#{}", self.id)
     }
 }

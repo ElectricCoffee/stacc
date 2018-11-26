@@ -1,3 +1,4 @@
+use std::fmt;
 use std::collections::VecDeque;
 use error::*;
 use scope::Scope;
@@ -153,4 +154,26 @@ impl Token {
             _ => false,
         }
     }
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::Token::*;
+        match &self {
+            Number(num) => write!(f, "{}", num),
+            Symbol(symbol) => write!(f, "{}", symbol),
+            String(string) => write!(f, "\"{}\"", string),
+            Scope(scope) => write!(f, "{}", scope),
+            List(stack) => write!(f, "{}", format_stack(&stack)),
+            Boolean(boolean) => write!(f, "{}", boolean),
+            Id(id) => write!(f, "{}", id),
+            _ => write!(f, ""),
+        }
+    }
+}
+
+/// Formats the stack into a flat space separated string surrouned by brackets
+fn format_stack(stack: &Stack) -> String {
+    let result = stack.iter().map(|sym| format!("{}", sym)).fold("".into(), |acc, sym| format!("{} {}", acc, sym));
+    format!("[{}]", result.trim())
 }
