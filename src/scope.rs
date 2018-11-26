@@ -6,6 +6,8 @@ use token::{Token, Stack};
 /// constant reference to the special value $$PARENT$$
 pub const PARENT: &str = "$$PARENT$$";
 
+pub type StackFrames = Vec<Scope>;
+
 /// Stores all the information needed within a scope
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
