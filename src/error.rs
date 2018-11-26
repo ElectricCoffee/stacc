@@ -15,4 +15,6 @@ pub enum Error {
     ArityMismatch,
     /// Issued when the user attempts to perform operations on an empty stack.
     EmptyStack,
+    /// Issued when trying to parse without a scope
+    MissingScope,
 }
