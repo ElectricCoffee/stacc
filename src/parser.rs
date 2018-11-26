@@ -32,8 +32,8 @@ lazy_static! {
 /// - `table` is the global scope table containing each scope's symbol tables
 /// - `scope` is the current scope
 /// - `symbol` is the symbol that needs parsing
-pub fn parse_symbol(table: &mut ScopeTable, frames: &mut StackFrames, symbol: &str) -> Result<()> {
-    let scope = frames.last_mut().ok_or(Error::MissingScope)?;
+pub fn parse_symbol(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<Option<Scope>> {
+    let mut new_scope = None;
     // get the callback stored in BIFS, if available
     if let Some(callback) = BIFS.get(symbol) {
         let mut args = Vec::new();
@@ -55,9 +55,8 @@ pub fn parse_symbol(table: &mut ScopeTable, frames: &mut StackFrames, symbol: &s
         let result = callback.invoke(table, scope, &args)?;
 
         // if the result is a scope, append it to the stack instead of pushing it
-        if let Token::Scope(mut result_scope) = result {
-            // deal with scope context switching here if the value is a scope.
-            unimplemented!();
+        if let Token::Scope(result_scope) = result {
+            new_scope = Some(result_scope);
         }
         // if the result isn't a void, add the result to the stack
         else if !result.is_void() {
@@ -67,9 +66,8 @@ pub fn parse_symbol(table: &mut ScopeTable, frames: &mut StackFrames, symbol: &s
     // if the first character in a symbol name is a $, assume it's a variable invocation
     else if symbol.starts_with('$') {
         let token = handle_invoke(table, scope, symbol)?;
-        if let Token::Scope(mut result_scope) = token {
-            // deal with scope context switching here if the value is a scope.
-            unimplemented!();
+        if let Token::Scope(result_scope) = token {
+            new_scope = Some(result_scope);
         } else {
             scope.stack.push(token);
         }
@@ -79,7 +77,7 @@ pub fn parse_symbol(table: &mut ScopeTable, frames: &mut StackFrames, symbol: &s
         scope.stack.push(Token::Symbol(symbol.into()));
     }
 
-    Ok(())
+    Ok(new_scope)
 }
 
 /// Applies a binary numeric operation and returns the resulting token.
