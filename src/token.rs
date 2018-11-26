@@ -4,7 +4,7 @@ use error::*;
 use scope::Scope;
 use uuid::Uuid;
 
-pub type Stack = VecDeque<Token>;
+pub type Stack = Vec<Token>;
 
 /// The tokens that make up the programming lanugage
 #[derive(Debug, Clone, PartialEq)]
@@ -173,7 +173,9 @@ impl fmt::Display for Token {
 }
 
 /// Formats the stack into a flat space separated string surrouned by brackets
-fn format_stack(stack: &Stack) -> String {
-    let result = stack.iter().map(|sym| format!("{}", sym)).fold("".into(), |acc, sym| format!("{} {}", acc, sym));
+fn format_stack(stack: &[Token]) -> String {
+    let result = stack.iter()
+        .map(|sym| format!("{}", sym)) // turn each symbol into a string
+        .fold("".into(), |acc, sym| format!("{} {}", acc, sym)); // merge all the strings into a single flat string
     format!("[{}]", result.trim())
 }
