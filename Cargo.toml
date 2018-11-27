@@ -11,3 +11,4 @@ uuid = {version = "0.7", features = ["serde", "v4"]} # for assigning unique IDs 
 serde = "1.0.80"                                     # for adding serialising and de-serialising capabilities
 serde_derive = "1.0.80"
 clap = {version = "2.32.0", features = ["yaml"]}     # for adding sane command-line arguments
+num = "0.2.0"

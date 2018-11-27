@@ -20,7 +20,7 @@ fn init_env(initial_stack: Stack) -> (tables::ScopeTable, scope::Scope) {
     (scopes, main_scope)
 }
 
-#[test]
+#[test] // test binary addition
 fn test_add() {
     let (mut scopes, mut main_scope) = init_env(mk_num_stack());
 
@@ -30,7 +30,9 @@ fn test_add() {
     assert!(res.is_ok());
     assert_eq!(expected_stack, main_scope.stack);
 }
-#[test]
+
+// test binary subtraction
+#[test] 
 fn test_sub() {
     let (mut scopes, mut main_scope) = init_env(mk_num_stack());
 
@@ -40,7 +42,9 @@ fn test_sub() {
     assert!(res.is_ok());
     assert_eq!(expected_stack, main_scope.stack);
 }
-#[test]
+
+// test binary division
+#[test] 
 fn test_div() {
     let (mut scopes, mut main_scope) = init_env(mk_num_stack());
 
@@ -51,8 +55,8 @@ fn test_div() {
     assert_eq!(expected_stack, main_scope.stack);
 }
 
-#[test]
 // true case
+#[test]
 fn test_if_then() {
     let (mut scopes, mut main_scope) = init_env(mk_if_stack(true));
 
@@ -63,9 +67,8 @@ fn test_if_then() {
     assert_eq!(expected_stack, main_scope.stack);
 }
 
-#[test]
-
 // false case
+#[test] 
 fn test_if_else() {
     let (mut scopes, mut main_scope) = init_env(mk_if_stack(false));
     let res = parser::parse_symbol(&mut scopes, &mut main_scope, "if");
@@ -74,7 +77,9 @@ fn test_if_else() {
     assert!(res.is_ok());
     assert_eq!(expected_stack, main_scope.stack);
 }
-#[test]
+
+// error case
+#[test] 
 fn test_if_error() {
     let init = vec![Token::String("Then case".into()), Token::String("Else case".into()), Token::Number(42.0)];
     let (mut scopes, mut main_scope) = init_env(init);
