@@ -72,6 +72,10 @@ and while that is indeed a valid ciritcism, I feel that being able to write `$na
 Possible solutions:
 * let `def` redefine it in the current scope, or if in a sub-scope, let it define it anew in there.
 
+**SOLUTION:** The solution to this has been disussed [here](#the-issue-of-namespace-resolution-during-variable-declaration).
+
+TL;DR: it involves using a different kind of notation for a variable when setting than when calling.
+
 ### Functions
 Functions are a funny subject in the world of stack-based evaluation.
 
@@ -155,6 +159,7 @@ During symbol resolution, the angle inside `$calc_coords` would be called `b3bd1
 
 Possible solutions:
 * Have the lookup operation performed by `def` clear out any values if they already exist
+* The `insert` method on hashmaps overwrites values stored within when written to, this should clear out anything within. **WARNING:** This approach could cause issues with sub-scopes. Further testing required.
 
 #### Keeping Track of Scope
 In order to keep scope resolution safe, sane, and healthy; we need to somehow be able to keep track of the current context, while also executing the new scope.
@@ -241,6 +246,54 @@ Possible solutions:
 * Clever application of a loop (possible solution [[here](https://stackoverflow.com/a/37987197/1351298)]),
 * Using reference counting (yikes),
 * Recursion via a helper function of the form `fn(&mut ScopeTable, Uuid, String) -> Result<()>`.
+
+**SOLUTION:**
+The actual solution to this problem was less-than straightforward, but it ended up being a more modular solution in the end.
+I ended up getting help on Reddit (Thank you /u/christophe_biocca!).
+
+The entire solution hinges on the introduction of a new sum type, which I've named `Lookup`:
+```rust
+pub enum Lookup {
+    Found(Uuid),
+    CheckParent(Uuid),
+    NotFound,
+}
+```
+The idea here, is to have this be the result of a lookup, which can have one of three different outcomes: 
+1. It was found; in which case we simply return the ID of the scope in which it is located.
+2. It was not found, but the scope has a parent; in which case the parent ID is returned.
+3. It was not found and the scope has no parent; in which case `NotFound` is returned.
+
+This is all done via a `lookup` function a-la this:
+```rust
+pub fn lookup(table: &mut ScopeTable, id: Uuid, symbol: &str) -> Lookup {
+    let symbol_table = table.get_mut(&id).unwrap();
+
+    if symbol_table.contains_key(symbol) {
+        Found(id)
+    } else if let Some(parent_id) = get_parent_id(symbol_table) {
+        CheckParent(parent_id)
+    } else {
+        NotFound
+    }
+}
+```
+The result of this function is then used in a function called `find_symbol`, which will keep trying to find the symbol recursively until it hits the root scope, if nothing is found, it returns an error.
+
+It has been implemented as follows:
+```rust
+pub fn find_symbol<'a>(table: &'a mut ScopeTable, id: Uuid, symbol: &str) -> Result<&'a mut SymbolTable> {
+    match lookup(table, id, symbol) {
+        Found(id) => Ok(table.get_mut(&id).unwrap()),
+        CheckParent(id) => find_symbol(table, id, symbol),
+        NotFound => Err(Error::UnknownIdentifier),
+    }
+}
+```
+The lifetime parameter `'a` is required here, because the result is a reference **into** the scope table.
+The lifetime is basically a guarantee to the compiler that says the result will only ever live as long as the context it came from.
+
+Armed with these two new functions, it is possible to gracefully deal with the `def` and `set` keywords, as well as dealing with namespace resolution (discussed in the next chapter).
 
 #### The Issue of Namespace Resolution During Variable Declaration
 Put simply, given an expression like `45 $angle def`, there's nothing that prevents the interpreter from looking up `$angle` in the symbol table, and replacing it with the existing value within the table.
