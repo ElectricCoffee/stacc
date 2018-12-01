@@ -360,7 +360,7 @@ In PostScript you write `/foo bar def`, which defines a variable called `foo` wi
 My best guess for PostScript would be that it suffers the same issue this does, so it uses the `/` to tell the interpreter to not evaluate the symbol and wait for the `def` keyword.
 
 The issue remains to find a syntax that isn't too awkward or hard to understand.
-I want to keep the `$` prefix, for the reasons mentioned in the _Variables_ section.
+I want to keep the `$` prefix, for the reasons mentioned in the [_Variables_ section](#variables).
 
 **DECISION:** I have decided to have variable declaration and invocation follow the _Bash_ way of doing things, meaning
 ```
@@ -417,6 +417,11 @@ subtracts 2 from 44 if the condition is false.
 
 Possible solutions:
 * put all the cases into their own scope, and use the length of said scope to determine number of cases
+
+### Interactive Mode
+An interactive mode could help both me, the developer, and the end-user with the language.
+It would help me by letting me test the parser before it's fully developed, letting me test the various features one at a time, essentially debugging it live.
+It would help the user by giving them a playground to try out things within the language to help them familiarise themselves with it.
 
 ### Matching Brackets
 Bracket matching is not entirely trivial.
