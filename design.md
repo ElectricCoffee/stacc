@@ -417,3 +417,28 @@ subtracts 2 from 44 if the condition is false.
 
 Possible solutions:
 * put all the cases into their own scope, and use the length of said scope to determine number of cases
+
+### Matching Brackets
+Bracket matching is not entirely trivial.
+First there's the issue of actually matching brackets (parehtneses and braces fall under this category too).
+given the input `[foo bar baz bing]` the parser should correctly store this as a single `List` token on the stack.
+
+Trying to write `[foo bar baz bing` will not go noticed by the parser at all until someone either tries to perform an operation, and the parser complains about not being able to perform addition on `[`, or they try to close with the wrong kind of bracket, in which case there will be a bracket mismatch.
+
+**PROBLEM:** In general there are 5 issues to be resolved:
+1. Matching `[` with `)` or `(` with `]` should throw an error
+2. Trying to perform any kind of operation on an opening bracket should throw an error
+3. Writing `)` or `]` without a staring bracket should also throw an error.
+4. Certain parentheses, like `()` should not resolve symbols; this requires a notion of "verbatim-ness"
+    * Writing `(2 3 +)` does not result in a scope containing `5`.
+    * A scope isn't very useful if everything within it is already evaluated before it's needed.
+    * This could also be used for adding verbatim lists, which can later be evealuated with `eval`
+5. In interactive mode (if that ever becomes a thing) a match error should revert the stack back to just before the offending operation was introduced.
+    * Writing `( 2 +` should return the stack back to `( 2` for example.
+    * This is to allow the user to correct their mistakes without having to redo everything.
+    * In the non-interactive version, this isn't a problem.
+
+Point 1, 2, and 3 are fairly trivial (I hope), simply involving popping values off the stack until a matching brace is found, then wrapping the popped values in their corresponding token.
+
+Point 4 is a bit trickier, since it involves somehow telling the symbol parser not to evaluate the symbols at all.
+Bypassing it entirely might be in order.
