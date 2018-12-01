@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::ops::*; // adds math operations to f64
 use token::Token;
 use error::{Error, Result};
-use scope::{Scope, StackFrames};
+use scope::{self, Scope, StackFrames};
 use tables::{self, ScopeTable};
 use callback::Callback;
 
@@ -25,6 +25,26 @@ lazy_static! {
         map.insert("set",  Callback { arity: 2, func: handle_set });
         map
     };
+}
+
+/// Parses a given token in the context of a scope table and the stack of stack frames
+pub fn parse(table: &mut ScopeTable, frames: &mut StackFrames, token: Token) -> Result<()> {
+    match token {
+        Token::Symbol(symbol) => {
+            // get the new frame in a local scope to avoid borrowing issues
+            let new_frame = {
+                let mut current_frame = scope::current_frame_mut(frames)?;
+                parse_symbol(table, &mut current_frame, &symbol)?
+            };
+
+            // if there is a new frame, push the new frame to the top of the frame stack
+            if let Some(new_frame) = new_frame {
+                frames.push(new_frame);
+            }
+        },
+        token => scope::current_frame_mut(frames)?.stack.push(token)
+    }
+    Ok(())
 }
 
 /// Parses an n-ary operator
