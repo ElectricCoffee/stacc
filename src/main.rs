@@ -1,6 +1,5 @@
 #![allow(unused)]
-use std::io;
-use std::fs;
+use std::{io, fs};
 
 #[macro_use]
 extern crate lazy_static;

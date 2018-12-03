@@ -1,5 +1,7 @@
-use std::collections::HashMap;
-use std::ops::*; // adds math operations to f64
+use std::{
+    collections::HashMap,
+    ops::{Add, Div, Mul, Neg, Sub}, // adds math operations to f64
+}; 
 use token::Token;
 use error::{Error, Result};
 use scope::{self, Scope, StackFrames};
