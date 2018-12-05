@@ -3,6 +3,7 @@ use token::{Token, Stack};
 use error::Error;
 use tables;
 use scope;
+use lexer;
 
 fn mk_num_stack() -> Stack {
     vec![Token::Number(12.0), Token::Number(2.0)]
@@ -88,4 +89,60 @@ fn test_if_error() {
     let expected_res = Err(Error::ArgumentMismatch);
 
     assert_eq!(expected_res, res);
+}
+
+#[test]
+fn test_mk_number() {
+    let result = lexer::mk_number("2.0");
+    let expected = Some(Token::Number(2.0));
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_mk_bool() {
+    let result = lexer::mk_bool("true");
+    let expected = Some(Token::Boolean(true));
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_mk_symbol() {
+    let result = lexer::mk_symbol("$foo");
+    let expected = Some(Token::Symbol("$foo".into()));
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_begin_scope() {
+    let result = lexer::mk_begin_scope("(");
+    let expected = Some(Token::BeginScope);
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_end_scope() {
+    let result = lexer::mk_end_scope(")");
+    let expected = Some(Token::EndScope);
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_begin_list() {
+    let result = lexer::mk_begin_list("[");
+    let expected = Some(Token::BeginList);
+
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_end_list() {
+    let result = lexer::mk_end_list("]");
+    let expected = Some(Token::EndList);
+
+    assert_eq!(result, expected);
 }
