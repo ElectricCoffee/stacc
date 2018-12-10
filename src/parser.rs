@@ -4,7 +4,7 @@ use std::{
 }; 
 use token::Token;
 use error::{Error, Result};
-use scope::{self, Scope, StackFrames};
+use scope::{self, Scope};
 use tables::{self, ScopeTable};
 use callback::Callback;
 
@@ -30,7 +30,7 @@ lazy_static! {
 }
 
 /// Parses a given token in the context of a scope table and the stack of stack frames
-pub fn parse(table: &mut ScopeTable, frames: &mut StackFrames, token: Token) -> Result<()> {
+pub fn parse(table: &mut ScopeTable, frames: &mut Vec<Scope>, token: Token) -> Result<()> {
     match token {
         Token::Symbol(symbol) => {
             // get the new frame in a local scope to avoid borrowing issues

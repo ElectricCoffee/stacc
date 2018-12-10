@@ -7,16 +7,13 @@ use error::{Result, Error};
 /// constant reference to the special value $$PARENT$$
 pub const PARENT: &str = "$$PARENT$$";
 
-/// A stack of scopes. I.e. stackframes
-pub type StackFrames = Vec<Scope>;
-
 /// Gets the topmost frame of the stack frames
-pub fn current_frame<'a>(frames: &'a StackFrames) -> Result<&'a Scope> {
+pub fn current_frame<'a>(frames: &'a [Scope]) -> Result<&'a Scope> {
     frames.last().ok_or(Error::MissingScope)
 }
 
 /// Gets the top most frame of the stack frames mutably
-pub fn current_frame_mut<'a>(frames: &'a mut StackFrames) -> Result<&'a mut Scope> {
+pub fn current_frame_mut<'a>(frames: &'a mut Vec<Scope>) -> Result<&'a mut Scope> {
     frames.last_mut().ok_or(Error::MissingScope)
 }
 

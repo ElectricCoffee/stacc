@@ -9,7 +9,7 @@ pub type SymbolTable = HashMap<String, Token>;
 
 /// Stores the symbol table of each scope
 pub type ScopeTable = HashMap<Uuid, SymbolTable>;
-
+ 
 /// Handles the three different symbol table lookup cases
 pub enum Lookup {
     /// A lookup was successful at the given ID
