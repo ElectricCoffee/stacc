@@ -5,7 +5,7 @@ use std::{
 use token::Token;
 use error::{Error, Result};
 use scope::{self, Scope};
-use tables::{self, ScopeTable};
+use tables::{self, ScopeTable, FrameTable};
 use callback::Callback;
 
 lazy_static! {
@@ -163,7 +163,7 @@ fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
     let name  = args[1].get_symbol()?;
     let id = scope.id();
 
-    let sym_table = tables::find_symbol(table, id, &name)?;
+    let sym_table = table.find_symbol(id, &name)?;
 
     sym_table.insert(name, value);
 
@@ -173,9 +173,9 @@ fn handle_set(table: &mut ScopeTable, scope: &mut Scope, args: &[Token]) -> Resu
 /// Finds a variable in the symbol table if it's available; if not it returns an error
 fn handle_invoke(table: &mut ScopeTable, scope: &mut Scope, symbol: &str) -> Result<Token> {
     let id = scope.id();
-    let sym_table = tables::find_symbol(table, id, symbol)?;
+    let sym_table = table.find_symbol(id, symbol)?;
 
-    let result = sym_table.get(symbol).unwrap().to_owned();
+    let result = sym_table[symbol].to_owned();
 
     Ok(result)
 }
