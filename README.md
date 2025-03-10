@@ -1,3 +1,5 @@
+This repo is dead. If you find it, I'll recommend you check out [Uiua](https://uiua.org) instead. It's pretty much what I was aiming for, but better designed.
+
 # The Stacc Programming Language
 Stacc is a toy language developed to explore some ideas I had about how a purely stack-based programming language might work.
 
